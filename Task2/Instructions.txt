@@ -1,0 +1,78 @@
+***TASK #2*** (FOR ALL GROUPS; checked by the bot)
+
+There are some necessary skills for every programmer — process files, calculate checksums, follow the instruction, etc. This task will help to train that.
+
+Use language of your group (PHP or Python). In principle, you can use anything else, like Java, C#, Rust or Ruby or anything you like (**you don't submit the code in this task, only the result**).
+
+1. Calculate **SHA3-256** for every file from archive (https://www.dropbox.com/s/oy2668zp1lsuseh/task2.zip?dl=1). Note, **files are binary, you don’t need encodings **— if you read file to string with some encoding, you have to use the same encoding to decode string into bytes back for hashing (there is a technical term for such conversions — “stupid activity”).
+
+2. Write hashes as **64 hex digits in lower case.**
+
+3. Sort hashes in the **ascending** order of the product of hex digits increased by one (for example, for the hash `63a6ba9e5de66b11ad6c6d3d1b39a5456f65f918fde6250565e365d89a5196c6` the sorting key is `71365623100112242680609229940949951316513259520000000000`).
+
+4. Join **sorted hashes without any separator** (not keys used for sorting, but hashes themselves).
+
+5. Concatenate resulted string with your e-mail in **lowercase**.
+
+6. Find the SHA3-256 of the result string.
+
+Send obtained 64 hex digits in the lower case to the https://discord.com/channels/950701840901746708/1258451022800617492 channel using the following command
+```
+!task2 email 64hexdigitshere
+```
+Note: SHA3-256 is not the same algorithm as SHA-256.
+
+Some additional hints: 
+* check if you use SHA3-256, 
+* check if you process exactly 256 required files (not everything in the some directory),
+* check if you concatenate your strings without separator — beware of JavaScript's join!
+* check if you write e-mail in lower case and e-mail goes to the end of the resulted string, 
+* and, of course, you have to calculate separate hash for every file, not to update the same hash with every file.
+
+> **Never work with *binary* files in text editors** — if your IDE, e.g., changes automagically even a single byte, your won't get a proper result (redownload the files if necessary).
+
+-----------------------------------------------
+
+About Task #2
+
+The hash algorithms work according to a very strict specification; all the "platforms" will get you the same results. There is no "partial" or "incomplete" implementation; it's either SHA3 or not (maybe it's some other algorithm). 
+
+The only problem you may encounter relates to proper interpretation of the data. E.g., what is ab? Is this a single byte [171] (0xAB = 171) or two bytes [97, 98] ('a' has ASCII code 97, and 'b' is 98)? But it’s mostly related to some string keys, like in the 4th task, not to binary data (unless you re-encode data by mistake in the second task).
+
+Beware of Keccak, which differs from SHA-3. However, some outdated libraries may still refer to it as SHA-3 (just use the out-of-the-box API of your platform).
+
+Tags: hints
+You need to debug your calculations and trace requirements into your code line by line (it’s the main training goal of this task). The list of most common mistakes is here: ⁠⚡main⁠. It's highly probalbe that your mistake is listed there, but if nothing else helps, send your code to p.lebedev@itransition.com, I will try to point out the problem. 
+
+-------------------------------------------------------------------------------------------
+
+About Task #2
+
+Well, just follow the step-by-step instruction and your will get the proper result. 
+
+Is it all? Well, don't write whatever you don't have to write. E.g. many of you have problems with proper unzipping all the files via the code. Well, you don't need to code this. Unzip the files manually — it's a single time operation.
+
+Also. 
+
+Check if you use SHA3-256 (note that SHA-256 is a different hash function; also, Keccak, albeit being a similar, differs slightly, so you will not get the proper results with it).  E.g., for JavaScript: beware of the outdated obsolete crypto-js, which uses Keccak even if you ask for SHA3. The solution is simple — use standard embedded node:crypto ignoring what AI says. 
+
+You can check what hash function you use by using standard test vectors. E.g., for empty string, SHA3-256 should return
+a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a (not c5d24601...).
+
+Output (just to debug) number of the files you process. You should get 256 (if you try to process all files in the folder, you may get something unwanted, like hidden files). It's helpful for debugging to print file names too.
+
+Concatenate your strings without separator — beware of JavaScript's join! 
+
+Check if you write e-mail and hashes in lower case and use the same e-mail during the submission that was used in code. 
+
+You have to calculate separate hash for every file, not to update the same hash with the next file.
+
+You have to process file content, not the file name. Check also that you read files as binary files, not trying to convert to chars with some encoding.
+
+Check the comparator function you use for sorting with the value from the task.
+
+I think these are the most common problems from the implementations you send to me to.
+
+If you still have problems, send a link to your code to p.lebedev@itransition.com, because you need to start working on the 3rd task.
+
+You need to split hash into separate hex digits, increase each by one and find the product of the resuts.
