@@ -39,5 +39,3 @@ def lcm_endpoint():
 if __name__ == '__main__':
     print(f"Server: http://127.0.0.1:5000/{Config.EMAIL_SLUG}")
     app.run(debug=True, port=5000)
-    print(f"Starting server at: http://127.0.0.1:5000/{Config.EMAIL_SLUG}")
-    app.run(debug=True, port=5000)
