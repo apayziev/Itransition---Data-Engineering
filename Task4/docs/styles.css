@@ -178,11 +178,14 @@ body {
 
 .author-badge {
     display: inline-block;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: rgba(255, 255, 255, 0.25);
     color: white;
-    padding: 8px 16px;
+    padding: 6px 12px;
     border-radius: 20px;
     font-weight: 500;
+    font-size: 0.85rem;
+    margin: 3px;
+    backdrop-filter: blur(4px);
 }
 
 .customer-id {
