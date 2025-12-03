@@ -26,7 +26,7 @@ pip install -r requirements.txt
 ## Files
 
 - `analysis.ipynb` - main analysis notebook
-- `dashboard/` - HTML dashboard with results
+- `docs/` - HTML dashboard (deployed via GitHub Pages)
 - `data/` - input data (DATA1, DATA2, DATA3)
 
 ## Results
