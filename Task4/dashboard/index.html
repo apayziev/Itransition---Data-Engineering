@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Orders Analytics Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark py-3">
+        <div class="container">
+            <span class="navbar-brand">
+                <i class="fas fa-chart-line me-2"></i>
+                Book Orders Analytics Dashboard
+            </span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-4">
+        <!-- Dataset Tabs -->
+        <ul class="nav nav-tabs justify-content-center mb-4" id="datasetTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="data1-tab" data-bs-toggle="tab" data-bs-target="#data1" type="button" role="tab">
+                    <i class="fas fa-database me-2"></i>DATA1
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="data2-tab" data-bs-toggle="tab" data-bs-target="#data2" type="button" role="tab">
+                    <i class="fas fa-database me-2"></i>DATA2
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="data3-tab" data-bs-toggle="tab" data-bs-target="#data3" type="button" role="tab">
+                    <i class="fas fa-database me-2"></i>DATA3
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="datasetTabContent">
+            <!-- DATA1 Tab -->
+            <div class="tab-pane fade show active" id="data1" role="tabpanel">
+                <div id="data1-content"></div>
+            </div>
+            <!-- DATA2 Tab -->
+            <div class="tab-pane fade" id="data2" role="tabpanel">
+                <div id="data2-content"></div>
+            </div>
+            <!-- DATA3 Tab -->
+            <div class="tab-pane fade" id="data3" role="tabpanel">
+                <div id="data3-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="mb-0">
+                <i class="fas fa-code me-2"></i>
+                Book Orders Analytics Dashboard | Task 4 Data Analysis
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Dashboard data (will be populated from JSON)
+        const dashboardData = {
+            "DATA1": {
+                "top_5_days": ["2025-01-02", "2024-11-14", "2024-09-06", "2024-11-09", "2024-10-07"],
+                "top_5_revenue": [3997.07, 3911.99, 3796.12, 3518.62, 3517.02],
+                "unique_users": 3115,
+                "unique_author_sets": 325,
+                "most_popular_author": ["Arlinda Huel"],
+                "top_customer_ids": [44850, 45062, 46955],
+                "top_customer_spending": 1386.76,
+                "daily_revenue": {
+                    "dates": [],
+                    "values": []
+                }
+            },
+            "DATA2": {
+                "top_5_days": ["2024-09-12", "2024-11-15", "2024-11-21", "2024-12-25", "2025-01-20"],
+                "top_5_revenue": [4048.85, 3677.17, 3590.09, 3572.11, 3561.51],
+                "unique_users": 2663,
+                "unique_author_sets": 293,
+                "most_popular_author": ["Jaimie Skiles"],
+                "top_customer_ids": [53583, 55058, 55420],
+                "top_customer_spending": 1312.84,
+                "daily_revenue": {
+                    "dates": [],
+                    "values": []
+                }
+            },
+            "DATA3": {
+                "top_5_days": ["2024-11-16", "2025-01-31", "2024-10-26", "2024-11-12", "2024-11-01"],
+                "top_5_revenue": [3688.20, 3341.99, 3127.92, 3034.54, 2954.03],
+                "unique_users": 3290,
+                "unique_author_sets": 268,
+                "most_popular_author": ["Benjamin Mills"],
+                "top_customer_ids": [49715, 50963],
+                "top_customer_spending": 1207.48,
+                "daily_revenue": {
+                    "dates": [],
+                    "values": []
+                }
+            }
+        };
+
+        // Load full data from JSON file
+        fetch('dashboard_data.json')
+            .then(response => response.json())
+            .then(data => {
+                Object.assign(dashboardData, data);
+                renderAllDashboards();
+            })
+            .catch(error => {
+                console.log('Using embedded data');
+                renderAllDashboards();
+            });
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(value);
+        }
+
+        function formatNumber(value) {
+            return new Intl.NumberFormat('en-US').format(value);
+        }
+
+        function renderDashboard(dataKey, containerId) {
+            const data = dashboardData[dataKey];
+            const container = document.getElementById(containerId);
+            
+            container.innerHTML = `
+                <!-- Metrics Row -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="metric-card position-relative">
+                            <i class="fas fa-users metric-icon"></i>
+                            <div class="metric-value">${formatNumber(data.unique_users)}</div>
+                            <div class="metric-label">Unique Users</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="metric-card success position-relative">
+                            <i class="fas fa-feather-alt metric-icon"></i>
+                            <div class="metric-value">${formatNumber(data.unique_author_sets)}</div>
+                            <div class="metric-label">Unique Author Sets</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="metric-card warning position-relative">
+                            <i class="fas fa-star metric-icon"></i>
+                            <div class="metric-value" style="font-size: 1.3rem;">${data.most_popular_author.join(', ')}</div>
+                            <div class="metric-label">Most Popular Author</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="metric-card danger position-relative">
+                            <i class="fas fa-trophy metric-icon"></i>
+                            <div class="metric-value">${formatCurrency(data.top_customer_spending)}</div>
+                            <div class="metric-label">Top Customer Spending</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Row -->
+                <div class="row g-4">
+                    <!-- Top 5 Days by Revenue -->
+                    <div class="col-lg-6">
+                        <div class="dashboard-card h-100">
+                            <div class="card-header">
+                                <h5><i class="fas fa-calendar-alt text-primary"></i> Top 5 Days by Revenue</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-container">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Rank</th>
+                                                <th>Date</th>
+                                                <th class="text-end">Revenue</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${data.top_5_days.map((date, i) => `
+                                                <tr>
+                                                    <td><span class="rank-badge rank-${i+1}">${i+1}</span></td>
+                                                    <td><strong>${date}</strong></td>
+                                                    <td class="text-end">${formatCurrency(data.top_5_revenue[i])}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Customer -->
+                    <div class="col-lg-6">
+                        <div class="dashboard-card h-100">
+                            <div class="card-header">
+                                <h5><i class="fas fa-crown text-warning"></i> Best Buyer (with aliases)</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="section-title">
+                                        <i class="fas fa-id-badge"></i> User IDs
+                                    </div>
+                                    <div>
+                                        ${data.top_customer_ids.map(id => `<span class="customer-id">${id}</span>`).join('')}
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="section-title">
+                                        <i class="fas fa-dollar-sign"></i> Total Spending
+                                    </div>
+                                    <div class="metric-value text-success">${formatCurrency(data.top_customer_spending)}</div>
+                                </div>
+                                <div class="mt-4 p-3 bg-light rounded">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        These user IDs represent the same customer who may have used different addresses, phones, emails, or aliases.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Revenue Chart -->
+                <div class="row g-4 mt-2">
+                    <div class="col-12">
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-area text-info"></i> Daily Revenue Chart</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="chart-${dataKey}"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Render chart if data is available
+            if (data.daily_revenue && data.daily_revenue.dates && data.daily_revenue.dates.length > 0) {
+                renderChart(dataKey, data.daily_revenue);
+            }
+        }
+
+        function renderChart(dataKey, dailyRevenue) {
+            const ctx = document.getElementById(`chart-${dataKey}`);
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dailyRevenue.dates,
+                    datasets: [{
+                        label: 'Daily Revenue ($)',
+                        data: dailyRevenue.values,
+                        borderColor: '#4F46E5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#4F46E5',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Revenue: ' + new Intl.NumberFormat('en-US', {
+                                        style: 'currency',
+                                        currency: 'USD'
+                                    }).format(context.raw);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxTicksLimit: 12,
+                                maxRotation: 45
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+        }
+
+        function renderAllDashboards() {
+            renderDashboard('DATA1', 'data1-content');
+            renderDashboard('DATA2', 'data2-content');
+            renderDashboard('DATA3', 'data3-content');
+        }
+
+        // Handle tab switching to re-render charts
+        document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(button => {
+            button.addEventListener('shown.bs.tab', function (event) {
+                const targetId = event.target.getAttribute('data-bs-target').replace('#', '');
+                const dataKey = targetId.toUpperCase();
+                const data = dashboardData[dataKey];
+                if (data && data.daily_revenue && data.daily_revenue.dates) {
+                    // Destroy existing chart if any
+                    const existingChart = Chart.getChart(`chart-${dataKey}`);
+                    if (existingChart) {
+                        existingChart.destroy();
+                    }
+                    renderChart(dataKey, data.daily_revenue);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
